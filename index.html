@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doppler Vasos de Cuello - Expert System v4.0</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .plaque-panel {
+            background-color: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .plaque-panel.active {
+            display: block;
+        }
+
+        .radio-group {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-container">
+        <header class="app-header">
+            <h1>Ecodoppler Arterial de Vasos de Cuello</h1>
+            <p class="subtitle">Evaluación Morfológica y Hemodinámica Práctica (v4.0)</p>
+        </header>
+
+        <main>
+            <section class="card section-patient">
+                <h2 class="section-title">Datos del Paciente</h2>
+                <div class="grid grid-3">
+                    <div class="input-group">
+                        <label for="paciente_id">Paciente / HC</label>
+                        <input type="text" id="paciente_id" placeholder="Apellido y Nombre">
+                    </div>
+                    <div class="input-group">
+                        <label for="edad">Edad</label>
+                        <input type="number" id="edad" placeholder="Años">
+                    </div>
+                    <div class="input-group">
+                        <label for="fecha">Fecha</label>
+                        <input type="text" id="fecha">
+                    </div>
+                </div>
+            </section>
+
+            <section class="section-carotids">
+                <h2 class="section-title">1 y 2. Evaluación Carotídea (Morfología y Hemodinamia)</h2>
+                <div class="grid grid-2">
+
+                    <!-- LADO DERECHO -->
+                    <div class="card side-card" id="card_d">
+                        <div class="side-header">
+                            <h3>Lado DERECHO</h3>
+                        </div>
+
+                        <!-- SITUACIONES ESPECIALES DERECHO -->
+                        <div class="form-row"
+                            style="margin-bottom: 10px; background: #fffcf0; padding: 10px; border-radius: 6px; border: 1px solid #fef08a;">
+                            <div class="input-group">
+                                <label for="d_especial" style="color: #854d0e;">Diagnósticos Especiales (Usar solo si
+                                    aplica)</label>
+                                <select id="d_especial">
+                                    <option value="ninguno">Ninguno (Estudio Habitual)</option>
+                                    <optgroup label="Quirúrgicos">
+                                        <option value="stent">Stent Carotídeo</option>
+                                        <option value="cea">Post-Endarterectomía (CEA)</option>
+                                    </optgroup>
+                                    <optgroup label="Obstructivos Graves">
+                                        <option value="suboclusion">Suboclusión (String sign)</option>
+                                        <option value="oclusion">Oclusión Total</option>
+                                    </optgroup>
+                                    <optgroup label="No Ateroscleróticos">
+                                        <option value="diseccion">Disección Carotídea</option>
+                                        <option value="trombosis">Trombosis Aguda</option>
+                                        <option value="aneurisma">Aneurisma / Ectasia</option>
+                                        <option value="arteritis">Arteritis</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- MORFOLOGÍA DERECHO -->
+                        <div class="form-row" id="d_normal_morfologia">
+                            <div class="grid grid-2" style="align-items: center;">
+                                <div class="input-group">
+                                    <label for="d_imt">GIM focalizado (mm)</label>
+                                    <input type="number" step="0.1" id="d_imt" placeholder="Ej: 0.8">
+                                </div>
+                                <div class="input-group">
+                                    <label>¿Hay Placa Ateromatosa?</label>
+                                    <div class="radio-group" style="margin-top: 5px;">
+                                        <label class="radio-label"><input type="radio" name="d_has_plaque" value="no"
+                                                checked> No</label>
+                                        <label class="radio-label"><input type="radio" name="d_has_plaque" value="si">
+                                            Sí</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PANEL DE PLACA DERECHO (Hidden by default) -->
+                            <div class="plaque-panel" id="d_plaque_panel">
+                                <div class="input-group" style="margin-bottom: 10px;">
+                                    <label for="d_placa_tipo">Tipo de Placa</label>
+                                    <select id="d_placa_tipo">
+                                        <option value="fibrocalcica">Fibrocálcica (Placa estable)</option>
+                                        <option value="blanda">Ateromatosa blanda/hipoecogénica (Placa vulnerable)
+                                        </option>
+                                        <option value="ulcerada">Irregular/Ulcerada (Placa complicada/vulnerable)
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-2" style="margin-bottom: 10px;">
+                                    <div class="input-group">
+                                        <label for="d_placa_ap">Espesor (AP)</label>
+                                        <input type="number" step="0.01" id="d_placa_ap" placeholder="Ej: 0.30">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="d_placa_l">Longitud (L)</label>
+                                        <input type="number" step="0.01" id="d_placa_l" placeholder="Ej: 0.60">
+                                    </div>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 10px;">
+                                    <label for="d_placa_loc">Localización Principal</label>
+                                    <select id="d_placa_loc">
+                                        <option value="bulbo">En bulbo carotídeo</option>
+                                        <option value="acc">En ACC distal</option>
+                                        <option value="aci">En origen de ACI</option>
+                                        <option value="bulbo_aci">Desde bulbo extendiéndose hacia ACI</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- HEMODINAMIA DERECHO -->
+                        <div class="form-row" id="d_flujo_box">
+                            <div class="input-group" style="margin-bottom: 10px;">
+                                <label for="d_flujo_cc">Patrón Espectral ACC</label>
+                                <select id="d_flujo_cc">
+                                    <option value="normal">Normal (Baja resistencia distal)</option>
+                                    <option value="parvus">Parvus et Tardus</option>
+                                    <option value="ar">Alta Resistencia / Damped</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="velocities-box" id="d_velocidades_box">
+                            <div class="grid grid-2">
+                                <div class="input-group">
+                                    <label for="d_vsp_cc">VPS ACC (cm/s)</label>
+                                    <input type="number" id="d_vsp_cc">
+                                </div>
+                                <div class="input-group">
+                                    <label for="d_vsp_ci">VPS ACI (cm/s)</label>
+                                    <input type="number" id="d_vsp_ci">
+                                </div>
+                                <div class="input-group">
+                                    <label for="d_vdf_ci">VDF ACI (cm/s)</label>
+                                    <input type="number" id="d_vdf_ci">
+                                </div>
+                                <div class="input-group">
+                                    <label for="d_ratio">Ratio (ICA/CCA)</label>
+                                    <input type="text" id="d_ratio" disabled class="disabled-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="d_status" class="status-indicator status-neutral">Faltan datos</div>
+                        <input type="hidden" id="d_grado_estenosis" value="normal">
+                    </div>
+
+                    <!-- LADO IZQUIERDO -->
+                    <div class="card side-card" id="card_i">
+                        <div class="side-header">
+                            <h3>Lado IZQUIERDO</h3>
+                        </div>
+
+                        <!-- SITUACIONES ESPECIALES IZQUIERDO -->
+                        <div class="form-row"
+                            style="margin-bottom: 10px; background: #fffcf0; padding: 10px; border-radius: 6px; border: 1px solid #fef08a;">
+                            <div class="input-group">
+                                <label for="i_especial" style="color: #854d0e;">Diagnósticos Especiales (Usar solo si
+                                    aplica)</label>
+                                <select id="i_especial">
+                                    <option value="ninguno">Ninguno (Estudio Habitual)</option>
+                                    <optgroup label="Quirúrgicos">
+                                        <option value="stent">Stent Carotídeo</option>
+                                        <option value="cea">Post-Endarterectomía (CEA)</option>
+                                    </optgroup>
+                                    <optgroup label="Obstructivos Graves">
+                                        <option value="suboclusion">Suboclusión (String sign)</option>
+                                        <option value="oclusion">Oclusión Total</option>
+                                    </optgroup>
+                                    <optgroup label="No Ateroscleróticos">
+                                        <option value="diseccion">Disección Carotídea</option>
+                                        <option value="trombosis">Trombosis Aguda</option>
+                                        <option value="aneurisma">Aneurisma / Ectasia</option>
+                                        <option value="arteritis">Arteritis</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- MORFOLOGÍA IZQUIERDO -->
+                        <div class="form-row" id="i_normal_morfologia">
+                            <div class="grid grid-2" style="align-items: center;">
+                                <div class="input-group">
+                                    <label for="i_imt">GIM focalizado (mm)</label>
+                                    <input type="number" step="0.1" id="i_imt" placeholder="Ej: 0.8">
+                                </div>
+                                <div class="input-group">
+                                    <label>¿Hay Placa Ateromatosa?</label>
+                                    <div class="radio-group" style="margin-top: 5px;">
+                                        <label class="radio-label"><input type="radio" name="i_has_plaque" value="no"
+                                                checked> No</label>
+                                        <label class="radio-label"><input type="radio" name="i_has_plaque" value="si">
+                                            Sí</label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- PANEL DE PLACA IZQUIERDO (Hidden by default) -->
+                            <div class="plaque-panel" id="i_plaque_panel">
+                                <div class="input-group" style="margin-bottom: 10px;">
+                                    <label for="i_placa_tipo">Tipo de Placa</label>
+                                    <select id="i_placa_tipo">
+                                        <option value="fibrocalcica">Fibrocálcica (Placa estable)</option>
+                                        <option value="blanda">Ateromatosa blanda/hipoecogénica (Placa vulnerable)
+                                        </option>
+                                        <option value="ulcerada">Irregular/Ulcerada (Placa complicada/vulnerable)
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="grid grid-2" style="margin-bottom: 10px;">
+                                    <div class="input-group">
+                                        <label for="i_placa_ap">Espesor (AP)</label>
+                                        <input type="number" step="0.01" id="i_placa_ap" placeholder="Ej: 0.30">
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="i_placa_l">Longitud (L)</label>
+                                        <input type="number" step="0.01" id="i_placa_l" placeholder="Ej: 0.60">
+                                    </div>
+                                </div>
+                                <div class="input-group" style="margin-bottom: 10px;">
+                                    <label for="i_placa_loc">Localización Principal</label>
+                                    <select id="i_placa_loc">
+                                        <option value="bulbo">En bulbo carotídeo</option>
+                                        <option value="acc">En ACC distal</option>
+                                        <option value="aci">En origen de ACI</option>
+                                        <option value="bulbo_aci">Desde bulbo extendiéndose hacia ACI</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="divider"></div>
+
+                        <!-- HEMODINAMIA IZQUIERDO -->
+                        <div class="form-row" id="i_flujo_box">
+                            <div class="input-group" style="margin-bottom: 10px;">
+                                <label for="i_flujo_cc">Patrón Espectral ACC</label>
+                                <select id="i_flujo_cc">
+                                    <option value="normal">Normal (Baja resistencia distal)</option>
+                                    <option value="parvus">Parvus et Tardus</option>
+                                    <option value="ar">Alta Resistencia / Damped</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="velocities-box" id="i_velocidades_box">
+                            <div class="grid grid-2">
+                                <div class="input-group">
+                                    <label for="i_vsp_cc">VPS ACC (cm/s)</label>
+                                    <input type="number" id="i_vsp_cc">
+                                </div>
+                                <div class="input-group">
+                                    <label for="i_vsp_ci">VPS ACI (cm/s)</label>
+                                    <input type="number" id="i_vsp_ci">
+                                </div>
+                                <div class="input-group">
+                                    <label for="i_vdf_ci">VDF ACI (cm/s)</label>
+                                    <input type="number" id="i_vdf_ci">
+                                </div>
+                                <div class="input-group">
+                                    <label for="i_ratio">Ratio (ICA/CCA)</label>
+                                    <input type="text" id="i_ratio" disabled class="disabled-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="i_status" class="status-indicator status-neutral">Faltan datos</div>
+                        <input type="hidden" id="i_grado_estenosis" value="normal">
+                    </div>
+                </div>
+            </section>
+
+            <section class="card section-vertebral">
+                <h2 class="section-title">Sector Vertebrobasilar</h2>
+                <div class="grid grid-2">
+                    <div class="input-group">
+                        <label for="vert_flujo">Evaluación de Flujo Hemodinámico</label>
+                        <select id="vert_flujo">
+                            <option value="normal">Anterógrado y Simétrico (Baja resistencia conservada)</option>
+                            <option value="hipoplasia_d">Hipoplasia Derecha (Dominancia Izquierda)</option>
+                            <option value="hipoplasia_i">Hipoplasia Izquierda (Dominancia Derecha)</option>
+                            <option value="robo_parcial_d">Robo Subclavio Parcial Derecho (Flujo alternante/Conejito)
+                            </option>
+                            <option value="robo_parcial_i">Robo Subclavio Parcial Izquierdo (Flujo alternante/Conejito)
+                            </option>
+                            <option value="robo_completo_d">Robo Subclavio Completo Derecho (Inversión
+                                sistólica-diastólica)</option>
+                            <option value="robo_completo_i">Robo Subclavio Completo Izquierdo (Inversión
+                                sistólica-diastólica)</option>
+                        </select>
+                    </div>
+                </div>
+            </section>
+
+            <section class="report-section">
+                <div class="report-header">
+                    <h2 class="section-title">Módulo 3: Síntesis Diagnóstica Clínica</h2>
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="btn-reset">Borrar Todo</button>
+                        <button class="btn btn-primary" id="btn-generate">Generar Informe</button>
+                        <button class="btn btn-secondary" id="btn-copy">Copiar al Portapapeles</button>
+                    </div>
+                </div>
+
+                <div class="textarea-wrapper">
+                    <textarea id="resultado" readonly
+                        placeholder="Haga clic en 'Generar Informe' para obtener el texto integrado clínico..."></textarea>
+                    <div id="copy-toast" class="toast">¡Copiado con éxito!</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
