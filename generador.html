@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Informe Doppler Carotídeo</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ─── Design Tokens ──────────────────────────────────── */
+    :root {
+      --primary:        #2563eb;
+      --primary-hover:  #1d4ed8;
+      --primary-light:  #dbeafe;
+      --bg:             #f1f5f9;
+      --surface:        #ffffff;
+      --border:         #e2e8f0;
+      --border-focus:   #93c5fd;
+      --text:           #0f172a;
+      --muted:          #64748b;
+      --danger:         #dc2626;
+      --success:        #16a34a;
+      --warn-bg:        #fffbeb;
+      --warn-border:    #f59e0b;
+      --warn-text:      #92400e;
+      --sidebar-w:      340px;
+      --radius:         8px;
+      --shadow-sm:      0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+      --shadow:         0 4px 12px rgba(0,0,0,.08);
+    }
+
+    /* ─── Reset ──────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { height: 100%; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.55;
+      min-height: 100%;
+    }
+
+    /* ─── Layout ─────────────────────────────────────────── */
+    .app {
+      display: grid;
+      grid-template-columns: var(--sidebar-w) 1fr;
+      grid-template-rows: auto 1fr;
+      grid-template-areas:
+        "header header"
+        "sidebar main";
+      min-height: 100vh;
+    }
+
+    /* ─── Header ─────────────────────────────────────────── */
+    .app-header {
+      grid-area: header;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: .9rem 1.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      box-shadow: var(--shadow-sm);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .app-header h1 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--primary);
+      letter-spacing: -.02em;
+    }
+
+    .app-header .subtitle {
+      font-size: .8rem;
+      color: var(--muted);
+      font-weight: 500;
+    }
+
+    .header-actions {
+      display: flex;
+      gap: .5rem;
+      flex-wrap: wrap;
+    }
+
+    /* ─── Sidebar ────────────────────────────────────────── */
+    .sidebar {
+      grid-area: sidebar;
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      padding: 1.25rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      overflow-y: auto;
+      height: calc(100vh - 57px);
+      position: sticky;
+      top: 57px;
+    }
+
+    /* ─── Main ───────────────────────────────────────────── */
+    .main {
+      grid-area: main;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      overflow-y: auto;
+    }
+
+    /* ─── Cards ──────────────────────────────────────────── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.1rem 1.2rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .card-title {
+      font-size: .75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+      margin-bottom: .85rem;
+      display: flex;
+      align-items: center;
+      gap: .4rem;
+    }
+
+    .card-title .badge {
+      background: var(--primary-light);
+      color: var(--primary);
+      padding: .1rem .4rem;
+      border-radius: 4px;
+      font-size: .65rem;
+      font-weight: 600;
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    /* ─── Form Elements ──────────────────────────────────── */
+    .field { display: flex; flex-direction: column; gap: .3rem; }
+
+    label.field-label {
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+    }
+
+    input, select, textarea {
+      width: 100%;
+      padding: .55rem .7rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: .9rem;
+      font-family: inherit;
+      color: var(--text);
+      background: var(--surface);
+      transition: border-color .15s, box-shadow .15s;
+      appearance: none;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,.15);
+    }
+
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right .75rem center;
+      padding-right: 2.2rem;
+      cursor: pointer;
+    }
+
+    /* ─── Variables Panel ────────────────────────────────── */
+    #vars-panel {
+      display: flex;
+      flex-direction: column;
+      gap: .75rem;
+    }
+
+    #vars-empty {
+      font-size: .83rem;
+      color: var(--muted);
+      font-style: italic;
+      text-align: center;
+      padding: .5rem 0;
+    }
+
+    /* ─── Suggestion Banner ──────────────────────────────── */
+    #suggestion-banner {
+      display: none;
+      background: var(--warn-bg);
+      border: 1px solid var(--warn-border);
+      border-radius: var(--radius);
+      padding: .75rem 1rem;
+      font-size: .82rem;
+      color: var(--warn-text);
+      line-height: 1.5;
+    }
+
+    #suggestion-banner strong { font-weight: 700; }
+
+    #suggestion-banner .suggest-btn {
+      display: inline-block;
+      margin-top: .5rem;
+      background: var(--warn-border);
+      color: var(--warn-text);
+      border: none;
+      border-radius: 5px;
+      padding: .25rem .6rem;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: inherit;
+      transition: background .15s;
+    }
+
+    #suggestion-banner .suggest-btn:hover { background: #f59e0b; }
+
+    /* ─── Report Textareas ───────────────────────────────── */
+    .textarea-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: .6rem;
+    }
+
+    .textarea-title {
+      font-size: .78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      color: var(--muted);
+    }
+
+    .char-count {
+      font-size: .72rem;
+      color: var(--muted);
+    }
+
+    #report-body {
+      height: 320px;
+      resize: vertical;
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: .855rem;
+      line-height: 1.7;
+      background: #fafafa;
+    }
+
+    #report-conclusion {
+      height: 90px;
+      resize: vertical;
+      font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+      font-size: .855rem;
+      line-height: 1.7;
+      background: #fafafa;
+    }
+
+    .placeholder-highlight {
+      color: var(--primary);
+    }
+
+    /* ─── Edit Notice ────────────────────────────────────── */
+    .edit-notice {
+      display: none;
+      font-size: .75rem;
+      color: var(--muted);
+      margin-top: .35rem;
+    }
+
+    .edit-notice.visible { display: block; }
+
+    /* ─── Buttons ────────────────────────────────────────── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .5rem 1rem;
+      font-size: .83rem;
+      font-weight: 600;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      transition: background .15s, transform .1s;
+      font-family: inherit;
+      white-space: nowrap;
+    }
+
+    .btn:active { transform: scale(.97); }
+
+    .btn-primary   { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid var(--border);
+    }
+    .btn-ghost:hover { background: var(--bg); color: var(--text); }
+
+    .btn-danger { background: #fee2e2; color: var(--danger); border: 1px solid #fecaca; }
+    .btn-danger:hover { background: #fecaca; }
+
+    .btn-sm { padding: .35rem .7rem; font-size: .78rem; }
+
+    /* ─── Toast ──────────────────────────────────────────── */
+    #toast {
+      position: fixed;
+      bottom: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: #1e293b;
+      color: #f8fafc;
+      padding: .6rem 1.2rem;
+      border-radius: 24px;
+      font-size: .83rem;
+      font-weight: 600;
+      box-shadow: var(--shadow);
+      opacity: 0;
+      visibility: hidden;
+      transition: all .25s ease;
+      z-index: 100;
+    }
+
+    #toast.show {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* ─── Divider ────────────────────────────────────────── */
+    .divider {
+      height: 1px;
+      background: var(--border);
+      margin: .2rem 0;
+    }
+
+    /* ─── Stats row ──────────────────────────────────────── */
+    .stats-row {
+      display: flex;
+      gap: 1.2rem;
+      font-size: .75rem;
+      color: var(--muted);
+      padding: .3rem 0;
+    }
+
+    .stats-row span { font-weight: 600; color: var(--text); }
+
+    /* ─── Keyboard hint ──────────────────────────────────── */
+    .kbd-hint {
+      font-size: .72rem;
+      color: var(--muted);
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+    }
+
+    .kbd-hint kbd {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: .1rem .35rem;
+      font-family: inherit;
+      font-size: .7rem;
+    }
+
+    /* ─── Template indicator ─────────────────────────────── */
+    #template-indicator {
+      font-size: .75rem;
+      color: var(--muted);
+      min-height: 1.2em;
+    }
+
+    #template-indicator .tpl-name {
+      font-weight: 600;
+      color: var(--primary);
+    }
+
+    /* ─── Responsive ─────────────────────────────────────── */
+    @media (max-width: 768px) {
+      .app {
+        grid-template-columns: 1fr;
+        grid-template-areas:
+          "header"
+          "sidebar"
+          "main";
+      }
+
+      .sidebar {
+        position: static;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .main { padding: 1rem; }
+
+      .header-actions { display: none; }
+
+      #report-body { height: 240px; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- ═══ HEADER ═══════════════════════════════════════════ -->
+  <header class="app-header">
+    <div>
+      <h1>Doppler Carotídeo — Generador de Informes</h1>
+      <div class="subtitle">Seleccione una plantilla y complete las variables</div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-ghost btn-sm" onclick="copyReport()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+        Copiar informe
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="exportTxt()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Exportar .txt
+      </button>
+      <button class="btn btn-danger btn-sm" onclick="clearAll()">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        Limpiar
+      </button>
+    </div>
+  </header>
+
+  <!-- ═══ SIDEBAR ══════════════════════════════════════════ -->
+  <aside class="sidebar">
+
+    <!-- Template selector -->
+    <div class="card">
+      <div class="card-title">Plantilla</div>
+      <div class="field">
+        <label class="field-label" for="template-select">Seleccionar plantilla</label>
+        <select id="template-select" onchange="onTemplateChange()">
+          <option value="">— Elegir plantilla —</option>
+        </select>
+      </div>
+      <div id="template-indicator" style="margin-top:.5rem;"></div>
+    </div>
+
+    <!-- Variables panel -->
+    <div class="card">
+      <div class="card-title">
+        Variables
+        <span class="badge" id="vars-count" style="display:none"></span>
+      </div>
+      <div id="vars-panel">
+        <div id="vars-empty">Seleccione una plantilla</div>
+      </div>
+    </div>
+
+    <!-- Suggestion banner -->
+    <div id="suggestion-banner"></div>
+
+    <!-- Keyboard hints -->
+    <div class="kbd-hint" style="padding: 0 .25rem;">
+      <span><kbd>Ctrl</kbd>+<kbd>C</kbd> Copiar informe</span>
+      <span><kbd>Ctrl</kbd>+<kbd>Enter</kbd> Copiar informe</span>
+    </div>
+
+  </aside>
+
+  <!-- ═══ MAIN ══════════════════════════════════════════════ -->
+  <main class="main">
+
+    <!-- Report body -->
+    <div class="card">
+      <div class="textarea-header">
+        <div class="textarea-title">Cuerpo del informe</div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <span class="char-count" id="body-count">0 caracteres</span>
+          <button class="btn btn-ghost btn-sm" onclick="resetBody()" title="Restablecer desde plantilla">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.47"/></svg>
+            Restablecer
+          </button>
+        </div>
+      </div>
+      <textarea
+        id="report-body"
+        spellcheck="true"
+        lang="es"
+        placeholder="El cuerpo del informe aparecerá aquí al seleccionar una plantilla…"
+        oninput="onBodyInput()"
+      ></textarea>
+      <div class="edit-notice" id="body-edit-notice">
+        ✏️ Texto editado manualmente — "Restablecer" vuelve a la plantilla con las variables actuales.
+      </div>
+    </div>
+
+    <!-- Conclusion -->
+    <div class="card">
+      <div class="textarea-header">
+        <div class="textarea-title">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="vertical-align:middle;margin-right:.3rem;"><polyline points="20 6 9 17 4 12"/></svg>
+          Conclusión
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="resetConclusion()" title="Restablecer conclusión">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-3.47"/></svg>
+          Restablecer
+        </button>
+      </div>
+      <textarea
+        id="report-conclusion"
+        spellcheck="true"
+        lang="es"
+        placeholder="La conclusión aparecerá aquí…"
+        oninput="onConclusionInput()"
+      ></textarea>
+      <div class="edit-notice" id="conclusion-edit-notice">
+        ✏️ Conclusión editada manualmente.
+      </div>
+    </div>
+
+    <!-- Action row -->
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div class="stats-row">
+        <span>Palabras: <span id="word-count">0</span></span>
+        <span>Caracteres: <span id="total-count">0</span></span>
+      </div>
+      <div style="display:flex;gap:.5rem;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="copyConclusion()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copiar conclusión
+        </button>
+        <button class="btn btn-primary" onclick="copyReport()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+          Copiar informe completo
+        </button>
+        <button class="btn btn-ghost" onclick="exportTxt()">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Exportar .txt
+        </button>
+        <button class="btn btn-danger" onclick="clearAll()">Limpiar todo</button>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════════════════════════════════
+     DATA
+════════════════════════════════════════════════════════════ -->
+<script>
+const TEMPLATES = [
+  {
+    "title": "Normal",
+    "variables": [],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nCalibres arteriales de las arterias carótidas bilaterales dentro de límites normales.\nParedes arteriales regulares, sin evidencia de engrosamientos parietales ni placas ateromatosas.\n\nLas velocidades de flujo se encuentran dentro de parámetros normales, con morfología espectral fisiológica y ausencia de aliasing en la señal color.\n\nNo se evidencian signos de estenosis ni alteraciones hemodinámicas en arterias carótidas comunes, internas ni externas.\n\nArterias vertebrales permeables, con flujo anterógrado y simétrico en segmento V2 bilateral.",
+    "conclusion": "Estudio dentro de límites normales. Sin ateromatosis ni estenosis."
+  },
+  {
+    "title": "Normal añoso (fibroesclerosis)",
+    "variables": [],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nCalibres arteriales conservados.\nParedes arteriales con aumento difuso de ecogenicidad (cambios fibroescleróticos), sin placas ateromatosas focales.\n\nFlujos con velocidades dentro de parámetros normales, sin aliasing ni turbulencia.\n\nArterias vertebrales permeables con flujo anterógrado bilateral.",
+    "conclusion": "Cambios parietales involutivos sin estenosis significativa."
+  },
+  {
+    "title": "Engrosamiento parietal difuso (IMT)",
+    "variables": [],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa engrosamiento parietal difuso sin evidencia de placas ateromatosas focales.\n\nFlujos conservados sin signos de estenosis hemodinámicamente significativa.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "conclusion": "Engrosamiento parietal difuso. Sin estenosis significativa."
+  },
+  {
+    "title": "Ateromatosis mínima unilateral",
+    "variables": ["lado"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa mínimo engrosamiento parietal focal a nivel del bulbo carotídeo {{lado}}, sin formación de placa definida.\n\nFlujos conservados sin alteraciones hemodinámicas.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "conclusion": "Ateromatosis mínima sin repercusión hemodinámica."
+  },
+  {
+    "title": "Placa pequeña no significativa",
+    "variables": ["lado", "tipo_placa"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa {{tipo_placa}} en bulbo carotídeo {{lado}}, sin compromiso significativo de la luz vascular.\n\nVelocidades dentro de parámetros normales, sin aliasing ni turbulencia.\n\nArterias vertebrales permeables.",
+    "conclusion": "Placa carotídea no significativa."
+  },
+  {
+    "title": "Placas bilaterales no significativas",
+    "variables": ["tipo_placa"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observan placas {{tipo_placa}} bilaterales a nivel de las bifurcaciones carotídeas, sin ulceraciones.\n\nNo generan compromiso significativo de la luz arterial.\n\nVelocidades dentro de parámetros normales.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "conclusion": "Ateromatosis carotídea bilateral sin estenosis significativa."
+  },
+  {
+    "title": "Ateromatosis difusa sin repercusión",
+    "variables": [],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe evidencia ateromatosis parietal difusa bilateral con placas pequeñas no obstructivas.\n\nNo se observan alteraciones hemodinámicas significativas.\n\nFlujos conservados sin aliasing.\n\nArterias vertebrales normales.",
+    "conclusion": "Ateromatosis difusa sin compromiso hemodinámico."
+  },
+  {
+    "title": "Estenosis <50%",
+    "variables": ["lado"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifican placas ateromatosas a nivel del bulbo carotídeo {{lado}} con reducción luminal menor al 50%.\n\nVelocidades dentro de límites normales o levemente aumentadas sin criterios de estenosis significativa.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "conclusion": "Estenosis carotídea <50%. Manejo clínico y control evolutivo."
+  },
+  {
+    "title": "Estenosis severa ACI",
+    "variables": ["lado", "vps", "vfd", "ratio"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa en el origen de la arteria carótida interna {{lado}} con reducción significativa de la luz.\n\nSe registran velocidades aumentadas: VPS {{vps}} cm/s, VFD {{vfd}} cm/s, relación ACI/ACC {{ratio}}, con aliasing y turbulencia espectral.\n\nHallazgos compatibles con estenosis severa (>70%).\n\nArterias vertebrales permeables.",
+    "conclusion": "Estenosis severa de ACI {{lado}}. Considerar evaluación para revascularización."
+  },
+  {
+    "title": "Oclusión ACI",
+    "variables": ["lado"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nNo se detecta flujo Doppler en la arteria carótida interna {{lado}}, compatible con oclusión.\n\nSe observa material endoluminal ecogénico.\n\nCarótida externa con flujo conservado.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "conclusion": "Oclusión de ACI {{lado}}. Manejo médico y evaluación clínica."
+  },
+  {
+    "title": "Estenosis carótida externa significativa",
+    "variables": ["lado", "vps"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica estenosis en arteria carótida externa {{lado}} con VPS de {{vps}} cm/s.\n\nFlujo distal presente con patrón de alta resistencia.\n\nResto de ejes carotídeos sin estenosis significativa.\n\nArterias vertebrales permeables.",
+    "conclusion": "Estenosis significativa de carótida externa {{lado}}."
+  }
+];
+
+// ─── Variable field definitions ───────────────────────────
+const VAR_CONFIG = {
+  lado: {
+    type: 'select',
+    label: 'Lado',
+    options: [
+      { value: 'derecha', label: 'Derecha' },
+      { value: 'izquierda', label: 'Izquierda' }
+    ]
+  },
+  tipo_placa: {
+    type: 'select',
+    label: 'Tipo de placa',
+    options: [
+      { value: 'fibrolipídica', label: 'Fibrolipídica' },
+      { value: 'fibrocalcificada', label: 'Fibrocalcificada' },
+      { value: 'heterogénea', label: 'Heterogénea' },
+      { value: 'mixta', label: 'Mixta' }
+    ]
+  },
+  vps: {
+    type: 'number',
+    label: 'VPS ACI (cm/s)',
+    placeholder: 'ej: 260',
+    step: '1',
+    min: '0'
+  },
+  vfd: {
+    type: 'number',
+    label: 'VFD ACI (cm/s)',
+    placeholder: 'ej: 110',
+    step: '1',
+    min: '0'
+  },
+  ratio: {
+    type: 'number',
+    label: 'Ratio ACI/ACC',
+    placeholder: 'ej: 4.2',
+    step: '0.1',
+    min: '0'
+  }
+};
+
+// ─── Smart suggestion rules ───────────────────────────────
+const SUGGESTIONS = [
+  {
+    test: (vals) => {
+      const vps = parseFloat(vals.vps);
+      return !isNaN(vps) && vps > 230;
+    },
+    message: (vals) => `VPS ${vals.vps} cm/s detectada — criterios de <strong>estenosis severa (&gt;70%)</strong>.`,
+    suggestTemplate: 'Estenosis severa ACI'
+  },
+  {
+    test: (vals) => {
+      const vps = parseFloat(vals.vps);
+      return !isNaN(vps) && vps >= 125 && vps <= 230;
+    },
+    message: (vals) => `VPS ${vals.vps} cm/s — compatible con <strong>estenosis moderada (50–70%)</strong> o leve.`,
+    suggestTemplate: 'Estenosis <50%'
+  }
+];
+
+// ─── App State ────────────────────────────────────────────
+let state = {
+  templateIdx: -1,
+  values: {},
+  bodyEdited: false,
+  conclusionEdited: false
+};
+
+// ─── Init ─────────────────────────────────────────────────
+(function init() {
+  const sel = document.getElementById('template-select');
+  TEMPLATES.forEach((t, i) => {
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = t.title;
+    sel.appendChild(opt);
+  });
+
+  // Restore last used template
+  const saved = localStorage.getItem('dopplerLastTemplate');
+  if (saved !== null && TEMPLATES[+saved]) {
+    sel.value = saved;
+    onTemplateChange();
+  }
+
+  // Keyboard shortcuts
+  document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+      e.preventDefault();
+      copyReport();
+    }
+  });
+
+  updateStats();
+})();
+
+// ─── Template selection ───────────────────────────────────
+function onTemplateChange() {
+  const sel = document.getElementById('template-select');
+  const idx = parseInt(sel.value, 10);
+
+  if (isNaN(idx)) {
+    state.templateIdx = -1;
+    clearAll(false);
+    return;
+  }
+
+  state.templateIdx = idx;
+  state.values = {};
+  state.bodyEdited = false;
+  state.conclusionEdited = false;
+
+  localStorage.setItem('dopplerLastTemplate', idx);
+
+  const tpl = TEMPLATES[idx];
+
+  // Init default values for each variable
+  tpl.variables.forEach(v => {
+    const cfg = VAR_CONFIG[v];
+    if (cfg && cfg.type === 'select') {
+      state.values[v] = cfg.options[0].value;
+    } else {
+      state.values[v] = '';
+    }
+  });
+
+  renderVarsPanel(tpl);
+  renderReport();
+  updateIndicator(tpl);
+  checkSuggestion();
+
+  document.getElementById('body-edit-notice').classList.remove('visible');
+  document.getElementById('conclusion-edit-notice').classList.remove('visible');
+}
+
+// ─── Render variable inputs ───────────────────────────────
+function renderVarsPanel(tpl) {
+  const panel = document.getElementById('vars-panel');
+  const empty = document.getElementById('vars-empty');
+  const countBadge = document.getElementById('vars-count');
+
+  panel.innerHTML = '';
+
+  if (!tpl.variables || tpl.variables.length === 0) {
+    panel.appendChild(Object.assign(document.createElement('div'), {
+      id: 'vars-empty',
+      textContent: 'Esta plantilla no requiere variables.',
+      style: 'font-size:.83rem;color:var(--muted);font-style:italic;text-align:center;padding:.5rem 0;'
+    }));
+    countBadge.style.display = 'none';
+    return;
+  }
+
+  countBadge.style.display = '';
+  countBadge.textContent = tpl.variables.length;
+
+  tpl.variables.forEach(varName => {
+    const cfg = VAR_CONFIG[varName] || { type: 'text', label: varName, placeholder: varName };
+    const wrap = document.createElement('div');
+    wrap.className = 'field';
+
+    const lbl = document.createElement('label');
+    lbl.className = 'field-label';
+    lbl.textContent = cfg.label || varName;
+
+    let input;
+    if (cfg.type === 'select') {
+      input = document.createElement('select');
+      cfg.options.forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt.value;
+        o.textContent = opt.label;
+        input.appendChild(o);
+      });
+      // Set default
+      if (state.values[varName]) input.value = state.values[varName];
+    } else {
+      input = document.createElement('input');
+      input.type = cfg.type || 'text';
+      input.placeholder = cfg.placeholder || '';
+      if (cfg.step) input.step = cfg.step;
+      if (cfg.min !== undefined) input.min = cfg.min;
+      if (state.values[varName]) input.value = state.values[varName];
+    }
+
+    input.dataset.var = varName;
+    input.addEventListener('input', onVarInput);
+    input.addEventListener('change', onVarInput);
+
+    wrap.appendChild(lbl);
+    wrap.appendChild(input);
+    panel.appendChild(wrap);
+  });
+}
+
+// ─── Variable input handler ───────────────────────────────
+function onVarInput(e) {
+  const varName = e.target.dataset.var;
+  state.values[varName] = e.target.value;
+
+  // Only re-render if user hasn't manually edited the body
+  if (!state.bodyEdited) {
+    renderBody();
+  }
+  if (!state.conclusionEdited) {
+    renderConclusion();
+  }
+
+  checkSuggestion();
+  updateStats();
+}
+
+// ─── Render body & conclusion from template ───────────────
+function renderReport() {
+  renderBody();
+  renderConclusion();
+  updateStats();
+}
+
+function applyVars(template) {
+  return template.replace(/\{\{(\w+)\}\}/g, (match, name) => {
+    return state.values[name] !== undefined && state.values[name] !== ''
+      ? state.values[name]
+      : match;
+  });
+}
+
+function renderBody() {
+  if (state.templateIdx < 0) return;
+  const tpl = TEMPLATES[state.templateIdx];
+  document.getElementById('report-body').value = applyVars(tpl.body);
+  updateStats();
+}
+
+function renderConclusion() {
+  if (state.templateIdx < 0) return;
+  const tpl = TEMPLATES[state.templateIdx];
+  document.getElementById('report-conclusion').value = applyVars(tpl.conclusion);
+}
+
+// ─── Manual edit trackers ─────────────────────────────────
+function onBodyInput() {
+  state.bodyEdited = true;
+  document.getElementById('body-edit-notice').classList.add('visible');
+  updateStats();
+}
+
+function onConclusionInput() {
+  state.conclusionEdited = true;
+  document.getElementById('conclusion-edit-notice').classList.add('visible');
+}
+
+// ─── Reset buttons ────────────────────────────────────────
+function resetBody() {
+  if (state.templateIdx < 0) return;
+  state.bodyEdited = false;
+  renderBody();
+  document.getElementById('body-edit-notice').classList.remove('visible');
+}
+
+function resetConclusion() {
+  if (state.templateIdx < 0) return;
+  state.conclusionEdited = false;
+  renderConclusion();
+  document.getElementById('conclusion-edit-notice').classList.remove('visible');
+}
+
+// ─── Smart suggestion ─────────────────────────────────────
+function checkSuggestion() {
+  const banner = document.getElementById('suggestion-banner');
+  const match = SUGGESTIONS.find(s => s.test(state.values));
+
+  if (!match) {
+    banner.style.display = 'none';
+    return;
+  }
+
+  const tplName = match.suggestTemplate;
+  const tplIdx = TEMPLATES.findIndex(t => t.title === tplName);
+
+  banner.style.display = 'block';
+  banner.innerHTML = `
+    👉 Sugerencia: ${match.message(state.values)}
+    ${tplIdx >= 0 ? `<br><button class="suggest-btn" onclick="applySuggestedTemplate(${tplIdx})">Usar plantilla "${tplName}"</button>` : ''}
+  `;
+}
+
+function applySuggestedTemplate(idx) {
+  const sel = document.getElementById('template-select');
+  sel.value = idx;
+  onTemplateChange();
+}
+
+// ─── Template indicator ───────────────────────────────────
+function updateIndicator(tpl) {
+  document.getElementById('template-indicator').innerHTML =
+    `Plantilla activa: <span class="tpl-name">${tpl.title}</span>`;
+}
+
+// ─── Stats ────────────────────────────────────────────────
+function updateStats() {
+  const body = document.getElementById('report-body').value;
+  const conclusion = document.getElementById('report-conclusion').value;
+  const full = body + ' ' + conclusion;
+
+  document.getElementById('body-count').textContent =
+    `${body.length} caracteres`;
+
+  document.getElementById('word-count').textContent =
+    full.trim() ? full.trim().split(/\s+/).length : 0;
+
+  document.getElementById('total-count').textContent =
+    full.trim().length;
+}
+
+// ─── Actions ──────────────────────────────────────────────
+function copyReport() {
+  const body = document.getElementById('report-body').value.trim();
+  const conclusion = document.getElementById('report-conclusion').value.trim();
+
+  if (!body && !conclusion) {
+    showToast('No hay informe para copiar.');
+    return;
+  }
+
+  let full = body;
+  if (conclusion) full += '\n\nCONCLUSIÓN:\n' + conclusion;
+
+  navigator.clipboard.writeText(full)
+    .then(() => showToast('✓ Informe copiado al portapapeles'))
+    .catch(() => fallbackCopy(full));
+}
+
+function copyConclusion() {
+  const text = document.getElementById('report-conclusion').value.trim();
+  if (!text) { showToast('No hay conclusión para copiar.'); return; }
+  navigator.clipboard.writeText(text)
+    .then(() => showToast('✓ Conclusión copiada'))
+    .catch(() => fallbackCopy(text));
+}
+
+function fallbackCopy(text) {
+  const ta = document.getElementById('report-body');
+  const prev = ta.value;
+  ta.value = text;
+  ta.select();
+  document.execCommand('copy');
+  ta.value = prev;
+  showToast('✓ Copiado');
+}
+
+function exportTxt() {
+  const body = document.getElementById('report-body').value.trim();
+  const conclusion = document.getElementById('report-conclusion').value.trim();
+
+  if (!body && !conclusion) {
+    showToast('No hay informe para exportar.');
+    return;
+  }
+
+  let full = body;
+  if (conclusion) full += '\n\nCONCLUSIÓN:\n' + conclusion;
+
+  const blob = new Blob([full], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+
+  const tplName = state.templateIdx >= 0
+    ? TEMPLATES[state.templateIdx].title.replace(/[^a-z0-9]/gi, '_').toLowerCase()
+    : 'informe';
+
+  const date = new Date().toISOString().slice(0, 10);
+  a.download = `doppler_${tplName}_${date}.txt`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Archivo exportado');
+}
+
+function clearAll(resetSelect = true) {
+  if (resetSelect) {
+    document.getElementById('template-select').value = '';
+    state.templateIdx = -1;
+    localStorage.removeItem('dopplerLastTemplate');
+    document.getElementById('template-indicator').textContent = '';
+    document.getElementById('suggestion-banner').style.display = 'none';
+  }
+
+  state.values = {};
+  state.bodyEdited = false;
+  state.conclusionEdited = false;
+
+  document.getElementById('report-body').value = '';
+  document.getElementById('report-conclusion').value = '';
+  document.getElementById('vars-panel').innerHTML =
+    '<div style="font-size:.83rem;color:var(--muted);font-style:italic;text-align:center;padding:.5rem 0;">Seleccione una plantilla</div>';
+  document.getElementById('vars-count').style.display = 'none';
+  document.getElementById('body-edit-notice').classList.remove('visible');
+  document.getElementById('conclusion-edit-notice').classList.remove('visible');
+
+  updateStats();
+}
+
+// ─── Toast ────────────────────────────────────────────────
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2800);
+}
+</script>
+</body>
+</html>
