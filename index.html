@@ -597,9 +597,9 @@ const TEMPLATES = [
   },
   {
     "title": "Ateromatosis difusa sin repercusión",
-    "variables": [],
-    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe evidencia ateromatosis parietal difusa bilateral con placas pequeñas no obstructivas.\n\nNo se observan alteraciones hemodinámicas significativas.\n\nFlujos conservados sin aliasing.\n\nArterias vertebrales normales.",
-    "conclusion": "Ateromatosis difusa sin compromiso hemodinámico."
+    "variables": ["tipo_placa"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe evidencia ateromatosis parietal difusa bilateral con múltiples placas {{tipo_placa}} de pequeño tamaño, sin ulceraciones ni obstrucción luminal significativa.\n\nNo se observan alteraciones hemodinámicas significativas.\n\nFlujos conservados sin aliasing.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "conclusion": "Ateromatosis carotídea difusa bilateral (placas {{tipo_placa}}). Sin compromiso hemodinámico."
   },
   {
     "title": "Estenosis <50%",
