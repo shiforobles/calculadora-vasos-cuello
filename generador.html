@@ -577,9 +577,10 @@ const TEMPLATES = [
     "conclusion": "Engrosamiento parietal difuso. Sin estenosis significativa."
   },
   {
-    "title": "Ateromatosis mínima unilateral",
-    "variables": ["lado"],
-    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa mínimo engrosamiento parietal focal a nivel del bulbo carotídeo {{lado}}, sin formación de placa definida.\n\nFlujos conservados sin alteraciones hemodinámicas.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "title": "Ateromatosis mínima",
+    "variables": ["lado_bilateral"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa mínimo engrosamiento parietal focal a nivel del bulbo carotídeo {{lado_bilateral}}, sin formación de placa definida.\n\nFlujos conservados sin alteraciones hemodinámicas.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "body_ambas": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa mínimo engrosamiento parietal focal bilateral a nivel de ambos bulbos carotídeos, sin formación de placa definida.\n\nFlujos conservados y simétricos sin alteraciones hemodinámicas.\n\nArterias vertebrales permeables con flujo anterógrado.",
     "conclusion": "Ateromatosis mínima sin repercusión hemodinámica."
   },
   {
@@ -605,6 +606,12 @@ const TEMPLATES = [
     "variables": ["lado"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifican placas ateromatosas a nivel del bulbo carotídeo {{lado}} con reducción luminal menor al 50%.\n\nVelocidades dentro de límites normales o levemente aumentadas sin criterios de estenosis significativa.\n\nArterias vertebrales permeables con flujo anterógrado.",
     "conclusion": "Estenosis carotídea <50%. Manejo clínico y control evolutivo."
+  },
+  {
+    "title": "Estenosis moderada ACI (50–69%)",
+    "variables": ["lado", "vps", "vfd", "ratio"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa a nivel del bulbo carotídeo y origen de arteria carótida interna {{lado}}, con reducción moderada de la luz vascular.\n\nSe registran velocidades moderadamente aumentadas: VPS {{vps}} cm/s, VFD {{vfd}} cm/s, relación ACI/ACC {{ratio}}, sin turbulencia franca.\n\nHallazgos compatibles con estenosis moderada (50–69%).\n\nArterias vertebrales permeables.",
+    "conclusion": "Estenosis moderada de ACI {{lado}} (50–69%). Tratamiento médico óptimo y control evolutivo periódico."
   },
   {
     "title": "Estenosis severa ACI",
@@ -634,6 +641,15 @@ const VAR_CONFIG = {
     options: [
       { value: 'derecha', label: 'Derecha' },
       { value: 'izquierda', label: 'Izquierda' }
+    ]
+  },
+  lado_bilateral: {
+    type: 'select',
+    label: 'Lado',
+    options: [
+      { value: 'derecho', label: 'Derecho' },
+      { value: 'izquierdo', label: 'Izquierdo' },
+      { value: 'ambas', label: 'Ambos lados' }
     ]
   },
   tipo_placa: {
@@ -684,8 +700,8 @@ const SUGGESTIONS = [
       const vps = parseFloat(vals.vps);
       return !isNaN(vps) && vps >= 125 && vps <= 230;
     },
-    message: (vals) => `VPS ${vals.vps} cm/s — compatible con <strong>estenosis moderada (50–70%)</strong> o leve.`,
-    suggestTemplate: 'Estenosis <50%'
+    message: (vals) => `VPS ${vals.vps} cm/s — compatible con <strong>estenosis moderada (50–69%)</strong>.`,
+    suggestTemplate: 'Estenosis moderada ACI (50–69%)'
   }
 ];
 
@@ -859,7 +875,11 @@ function applyVars(template) {
 function renderBody() {
   if (state.templateIdx < 0) return;
   const tpl = TEMPLATES[state.templateIdx];
-  document.getElementById('report-body').value = applyVars(tpl.body);
+  // Use body_ambas variant when lado_bilateral === 'ambas'
+  const bodyTemplate = (tpl.body_ambas && state.values['lado_bilateral'] === 'ambas')
+    ? tpl.body_ambas
+    : tpl.body;
+  document.getElementById('report-body').value = applyVars(bodyTemplate);
   updateStats();
 }
 
