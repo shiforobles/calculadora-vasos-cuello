@@ -708,74 +708,102 @@
 ════════════════════════════════════════════════════════════ -->
 <script>
 const TEMPLATES = [
+  // ── Grupo 1: Sin patología ──────────────────────────────
   {
+    "group": "Sin patología",
     "title": "Normal",
     "variables": [],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nCalibres arteriales de las arterias carótidas bilaterales dentro de límites normales.\nParedes arteriales regulares, sin evidencia de engrosamientos parietales ni placas ateromatosas.\n\nLas velocidades de flujo se encuentran dentro de parámetros normales, con morfología espectral fisiológica y ausencia de aliasing en la señal color.\n\nNo se evidencian signos de estenosis ni alteraciones hemodinámicas en arterias carótidas comunes, internas ni externas.\n\nArterias vertebrales permeables, con flujo anterógrado y simétrico en segmento V2 bilateral.",
     "conclusion": "Estudio dentro de límites normales. Sin ateromatosis ni estenosis."
   },
   {
+    "group": "Sin patología",
     "title": "Normal añoso (fibroesclerosis)",
     "variables": [],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nCalibres arteriales conservados.\nParedes arteriales con aumento difuso de ecogenicidad (cambios fibroescleróticos), sin placas ateromatosas focales.\n\nFlujos con velocidades dentro de parámetros normales, sin aliasing ni turbulencia.\n\nArterias vertebrales permeables con flujo anterógrado bilateral.",
     "conclusion": "Cambios parietales involutivos sin estenosis significativa."
   },
+
+  // ── Grupo 2: Aterosclerosis subclínica ─────────────────
   {
+    "group": "Aterosclerosis subclínica",
     "title": "Engrosamiento parietal difuso (IMT)",
     "variables": [],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa engrosamiento parietal difuso sin evidencia de placas ateromatosas focales.\n\nFlujos conservados sin signos de estenosis hemodinámicamente significativa.\n\nArterias vertebrales permeables con flujo anterógrado.",
     "conclusion": "Engrosamiento parietal difuso. Sin estenosis significativa."
   },
   {
+    "group": "Aterosclerosis subclínica",
     "title": "Ateromatosis mínima",
     "variables": ["lado_bilateral"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa mínimo engrosamiento parietal focal a nivel del bulbo carotídeo {{lado_bilateral}}, sin formación de placa definida.\n\nFlujos conservados sin alteraciones hemodinámicas.\n\nArterias vertebrales permeables con flujo anterógrado.",
     "body_ambas": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observa mínimo engrosamiento parietal focal bilateral a nivel de ambos bulbos carotídeos, sin formación de placa definida.\n\nFlujos conservados y simétricos sin alteraciones hemodinámicas.\n\nArterias vertebrales permeables con flujo anterógrado.",
     "conclusion": "Ateromatosis mínima sin repercusión hemodinámica."
   },
+
+  // ── Grupo 3: Placa no obstructiva ──────────────────────
   {
+    "group": "Placa no obstructiva",
     "title": "Placa pequeña no significativa",
     "variables": ["lado", "tipo_placa"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa {{tipo_placa}} en bulbo carotídeo {{lado}}, sin compromiso significativo de la luz vascular.\n\nVelocidades dentro de parámetros normales, sin aliasing ni turbulencia.\n\nArterias vertebrales permeables.",
     "conclusion": "Placa carotídea no significativa."
   },
   {
+    "group": "Placa no obstructiva",
     "title": "Placas bilaterales no significativas",
     "variables": ["tipo_placa"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe observan placas {{tipo_placa}} bilaterales a nivel de las bifurcaciones carotídeas, sin ulceraciones.\n\nNo generan compromiso significativo de la luz arterial.\n\nVelocidades dentro de parámetros normales.\n\nArterias vertebrales permeables con flujo anterógrado.",
     "conclusion": "Ateromatosis carotídea bilateral sin estenosis significativa."
   },
   {
+    "group": "Placa no obstructiva",
     "title": "Ateromatosis difusa sin repercusión",
     "variables": ["tipo_placa"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe evidencia ateromatosis parietal difusa bilateral con múltiples placas {{tipo_placa}} de pequeño tamaño, sin ulceraciones ni obstrucción luminal significativa.\n\nNo se observan alteraciones hemodinámicas significativas.\n\nFlujos conservados sin aliasing.\n\nArterias vertebrales permeables con flujo anterógrado.",
     "conclusion": "Ateromatosis carotídea difusa bilateral (placas {{tipo_placa}}). Sin compromiso hemodinámico."
   },
+
+  // ── Grupo 4: Estenosis carotídea ACI ───────────────────
   {
-    "title": "Estenosis <50%",
+    "group": "Estenosis carotídea ACI",
+    "title": "Estenosis leve ACI (<50%)",
     "variables": ["lado"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifican placas ateromatosas a nivel del bulbo carotídeo {{lado}} con reducción luminal menor al 50%.\n\nVelocidades dentro de límites normales o levemente aumentadas sin criterios de estenosis significativa.\n\nArterias vertebrales permeables con flujo anterógrado.",
-    "conclusion": "Estenosis carotídea <50%. Manejo clínico y control evolutivo."
+    "conclusion": "Estenosis carotídea leve (<50%). Manejo clínico y control evolutivo."
   },
   {
+    "group": "Estenosis carotídea ACI",
     "title": "Estenosis moderada ACI (50–69%)",
     "variables": ["lado", "vps", "vfd", "ratio"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa a nivel del bulbo carotídeo y origen de arteria carótida interna {{lado}}, con reducción moderada de la luz vascular.\n\nSe registran velocidades moderadamente aumentadas: VPS {{vps}} cm/s, VFD {{vfd}} cm/s, relación ACI/ACC {{ratio}}, sin turbulencia franca.\n\nHallazgos compatibles con estenosis moderada (50–69%).\n\nArterias vertebrales permeables.",
     "conclusion": "Estenosis moderada de ACI {{lado}} (50–69%). Tratamiento médico óptimo y control evolutivo periódico."
   },
   {
-    "title": "Estenosis severa ACI",
+    "group": "Estenosis carotídea ACI",
+    "title": "Estenosis severa ACI (>70%)",
     "variables": ["lado", "vps", "vfd", "ratio"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa en el origen de la arteria carótida interna {{lado}} con reducción significativa de la luz.\n\nSe registran velocidades aumentadas: VPS {{vps}} cm/s, VFD {{vfd}} cm/s, relación ACI/ACC {{ratio}}, con aliasing y turbulencia espectral.\n\nHallazgos compatibles con estenosis severa (>70%).\n\nArterias vertebrales permeables.",
-    "conclusion": "Estenosis severa de ACI {{lado}}. Considerar evaluación para revascularización."
+    "conclusion": "Estenosis severa de ACI {{lado}} (>70%). Derivación a cirugía vascular para evaluación de revascularización."
   },
   {
+    "group": "Estenosis carotídea ACI",
+    "title": "Suboclusión ACI (near-occlusion)",
+    "variables": ["lado", "vps"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica luz residual filiforme en arteria carótida interna {{lado}}, con señal Doppler color de bajo flujo (\"string sign\").\n\nVPS residual {{vps}} cm/s. Las velocidades pueden estar paradójicamente reducidas por colapso del lumen distal a la lesión crítica.\n\nHallazgos compatibles con suboclusión (near-occlusion) — lesión >99% con mínima luz residual.\n\nArterias vertebrales permeables.",
+    "conclusion": "Suboclusión de ACI {{lado}} (near-occlusion). Derivación urgente a cirugía vascular."
+  },
+  {
+    "group": "Estenosis carotídea ACI",
     "title": "Oclusión ACI",
     "variables": ["lado"],
-    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nNo se detecta flujo Doppler en la arteria carótida interna {{lado}}, compatible con oclusión.\n\nSe observa material endoluminal ecogénico.\n\nCarótida externa con flujo conservado.\n\nArterias vertebrales permeables con flujo anterógrado.",
-    "conclusion": "Oclusión de ACI {{lado}}. Manejo médico y evaluación clínica."
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nNo se detecta flujo Doppler en la arteria carótida interna {{lado}}, compatible con oclusión total.\n\nSe observa material endoluminal ecogénico.\n\nCarótida externa ipsilateral con flujo conservado.\n\nArterias vertebrales permeables con flujo anterógrado.",
+    "conclusion": "Oclusión total de ACI {{lado}}. Tratamiento médico y evaluación neurológica."
   },
+
+  // ── Grupo 5: Otras patologías ───────────────────────────
   {
+    "group": "Otras patologías",
     "title": "Estenosis carótida externa significativa",
     "variables": ["lado", "vps"],
     "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica estenosis en arteria carótida externa {{lado}} con VPS de {{vps}} cm/s.\n\nFlujo distal presente con patrón de alta resistencia.\n\nResto de ejes carotídeos sin estenosis significativa.\n\nArterias vertebrales permeables.",
@@ -843,7 +871,7 @@ const SUGGESTIONS = [
       return !isNaN(vps) && vps > 230;
     },
     message: (vals) => `VPS ${vals.vps} cm/s detectada — criterios de <strong>estenosis severa (&gt;70%)</strong>.`,
-    suggestTemplate: 'Estenosis severa ACI'
+    suggestTemplate: 'Estenosis severa ACI (>70%)'
   },
   {
     test: (vals) => {
@@ -866,18 +894,31 @@ let state = {
 // ─── Init ─────────────────────────────────────────────────
 (function init() {
   const sel = document.getElementById('template-select');
+
+  // Build grouped <optgroup> menu
+  const groups = {};
   TEMPLATES.forEach((t, i) => {
-    const opt = document.createElement('option');
-    opt.value = i;
-    opt.textContent = t.title;
-    sel.appendChild(opt);
+    const g = t.group || 'General';
+    if (!groups[g]) groups[g] = [];
+    groups[g].push({ t, i });
+  });
+  Object.entries(groups).forEach(([name, items]) => {
+    const og = document.createElement('optgroup');
+    og.label = name;
+    items.forEach(({ t, i }) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = t.title;
+      og.appendChild(opt);
+    });
+    sel.appendChild(og);
   });
 
-  // Restore last used template
-  const saved = localStorage.getItem('dopplerLastTemplate');
-  if (saved !== null && TEMPLATES[+saved]) {
-    sel.value = saved;
-    onTemplateChange();
+  // Restore last used template by title (robust against reordering)
+  const savedTitle = localStorage.getItem('dopplerLastTemplate');
+  if (savedTitle) {
+    const idx = TEMPLATES.findIndex(t => t.title === savedTitle);
+    if (idx >= 0) { sel.value = idx; onTemplateChange(); }
   }
 
   // Keyboard shortcuts
@@ -907,7 +948,7 @@ function onTemplateChange() {
   state.bodyEdited = false;
   state.conclusionEdited = false;
 
-  localStorage.setItem('dopplerLastTemplate', idx);
+  localStorage.setItem('dopplerLastTemplate', tpl.title);
 
   const tpl = TEMPLATES[idx];
 
@@ -1293,7 +1334,7 @@ function getGuideData() {
     'Placa pequeña no significativa',
     'Placas bilaterales no significativas',
     'Ateromatosis difusa sin repercusión',
-    'Estenosis <50%',
+    'Estenosis leve ACI (<50%)',
   ].includes(t);
 
   if (esPlaqueTemplate) return {
@@ -1340,7 +1381,7 @@ function getGuideData() {
   };
 
   // ── Estenosis severa ────────────────────────────────────
-  if (t === 'Estenosis severa ACI') return {
+  if (t === 'Estenosis severa ACI (>70%)') return {
     dx: 'Estenosis severa de ACI — evaluar revascularización',
     riesgo: 'Muy alto / Crítico', riesgoClass: 'riesgo-critico',
     conducta: [
@@ -1360,6 +1401,28 @@ function getGuideData() {
       ['Umbral quirúrgico asintomático', '≥ 70%'],
       ['Técnica de elección', 'CEA (endarterectomía)'],
       ['Alternativa', 'CAS (stenting) si alto riesgo quirúrgico'],
+    ]
+  };
+
+  // ── Suboclusión ─────────────────────────────────────────
+  if (t === 'Suboclusión ACI (near-occlusion)') return {
+    dx: 'Near-occlusion — estenosis >99% con luz residual mínima (string sign)',
+    riesgo: 'Crítico', riesgoClass: 'riesgo-critico',
+    conducta: [
+      '⚠️ Derivación URGENTE a cirugía vascular / neurointervencionismo',
+      '⚠️ TRAMPA: las velocidades pueden ser BAJAS o normales (colapso distal del lumen)',
+      'Buscar "string sign" en color Doppler: señal filiforme en ACI',
+      'Doble antiagregación inmediata: AAS 100 mg + Clopidogrel 75 mg',
+      'Estatina alta intensidad',
+      'Si sintomático: hospitalización — riesgo muy elevado de ACV inminente',
+    ],
+    seguimiento: 'Urgente — no diferir consulta vascular',
+    ref: [
+      ['String sign', 'Luz filiforme visible en color Doppler'],
+      ['VPS', 'Puede ser BAJA paradójicamente (colapso distal)'],
+      ['Diferencial oclusión', 'Suboclusión: señal filiforme presente'],
+      ['Diferencial oclusión', 'Oclusión total: ausencia completa de flujo'],
+      ['Riesgo de ACV', 'Mayor que en estenosis severa clásica'],
     ]
   };
 
