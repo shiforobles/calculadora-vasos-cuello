@@ -775,15 +775,15 @@ const TEMPLATES = [
   {
     "group": "Estenosis carotídea ACI",
     "title": "Estenosis moderada ACI (50–69%)",
-    "variables": ["lado", "vps", "vfd", "ratio"],
-    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa a nivel del bulbo carotídeo y origen de arteria carótida interna {{lado}}, con reducción moderada de la luz vascular.\n\nSe registran velocidades moderadamente aumentadas: VPS {{vps}} cm/s, VFD {{vfd}} cm/s, relación ACI/ACC {{ratio}}, sin turbulencia franca.\n\nHallazgos compatibles con estenosis moderada (50–69%).\n\nArterias vertebrales permeables.",
+    "variables": ["lado", "vps_acc", "vps", "vfd", "ratio"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa a nivel del bulbo carotídeo y origen de arteria carótida interna {{lado}}, con reducción moderada de la luz vascular.\n\nSe registran velocidades moderadamente aumentadas: VPS ACC {{vps_acc}} cm/s, VPS ACI {{vps}} cm/s, VFD ACI {{vfd}} cm/s, relación ACI/ACC {{ratio}}, sin turbulencia franca.\n\nHallazgos compatibles con estenosis moderada (50–69%).\n\nArterias vertebrales permeables.",
     "conclusion": "Estenosis moderada de ACI {{lado}} (50–69%). Tratamiento médico óptimo y control evolutivo periódico."
   },
   {
     "group": "Estenosis carotídea ACI",
     "title": "Estenosis severa ACI (>70%)",
-    "variables": ["lado", "vps", "vfd", "ratio"],
-    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa en el origen de la arteria carótida interna {{lado}} con reducción significativa de la luz.\n\nSe registran velocidades aumentadas: VPS {{vps}} cm/s, VFD {{vfd}} cm/s, relación ACI/ACC {{ratio}}, con aliasing y turbulencia espectral.\n\nHallazgos compatibles con estenosis severa (>70%).\n\nArterias vertebrales permeables.",
+    "variables": ["lado", "vps_acc", "vps", "vfd", "ratio"],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nSe identifica placa ateromatosa en el origen de la arteria carótida interna {{lado}} con reducción significativa de la luz.\n\nSe registran velocidades aumentadas: VPS ACC {{vps_acc}} cm/s, VPS ACI {{vps}} cm/s, VFD ACI {{vfd}} cm/s, relación ACI/ACC {{ratio}}, con aliasing y turbulencia espectral.\n\nHallazgos compatibles con estenosis severa (>70%).\n\nArterias vertebrales permeables.",
     "conclusion": "Estenosis severa de ACI {{lado}} (>70%). Derivación a cirugía vascular para evaluación de revascularización."
   },
   {
@@ -840,6 +840,13 @@ const VAR_CONFIG = {
       { value: 'mixta', label: 'Mixta' }
     ]
   },
+  vps_acc: {
+    type: 'number',
+    label: 'VPS ACC (cm/s)',
+    placeholder: 'ej: 80',
+    step: '1',
+    min: '0'
+  },
   vps: {
     type: 'number',
     label: 'VPS ACI (cm/s)',
@@ -856,10 +863,11 @@ const VAR_CONFIG = {
   },
   ratio: {
     type: 'number',
-    label: 'Ratio ACI/ACC',
-    placeholder: 'ej: 4.2',
+    label: 'Ratio ACI/ACC (auto)',
+    placeholder: '—',
     step: '0.1',
-    min: '0'
+    min: '0',
+    readonly: true
   }
 };
 
@@ -1019,11 +1027,17 @@ function renderVarsPanel(tpl) {
       if (cfg.step) input.step = cfg.step;
       if (cfg.min !== undefined) input.min = cfg.min;
       if (state.values[varName]) input.value = state.values[varName];
+      if (cfg.readonly) {
+        input.readOnly = true;
+        input.style.cssText = 'background:#f1f5f9;color:#475569;font-weight:600;cursor:default;';
+      }
     }
 
     input.dataset.var = varName;
-    input.addEventListener('input', onVarInput);
-    input.addEventListener('change', onVarInput);
+    if (!cfg.readonly) {
+      input.addEventListener('input', onVarInput);
+      input.addEventListener('change', onVarInput);
+    }
 
     wrap.appendChild(lbl);
     wrap.appendChild(input);
@@ -1035,6 +1049,22 @@ function renderVarsPanel(tpl) {
 function onVarInput(e) {
   const varName = e.target.dataset.var;
   state.values[varName] = e.target.value;
+
+  // Auto-calculate ratio when VPS ACC or VPS ACI changes
+  if (varName === 'vps' || varName === 'vps_acc') {
+    const vpsAci = parseFloat(state.values.vps);
+    const vpsAcc = parseFloat(state.values.vps_acc);
+    if (!isNaN(vpsAci) && !isNaN(vpsAcc) && vpsAcc > 0) {
+      const ratio = (vpsAci / vpsAcc).toFixed(1);
+      state.values.ratio = ratio;
+      const ratioInput = document.querySelector('[data-var="ratio"]');
+      if (ratioInput) ratioInput.value = ratio;
+    } else {
+      state.values.ratio = '';
+      const ratioInput = document.querySelector('[data-var="ratio"]');
+      if (ratioInput) ratioInput.value = '';
+    }
+  }
 
   // Only re-render if user hasn't manually edited the body
   if (!state.bodyEdited) {
