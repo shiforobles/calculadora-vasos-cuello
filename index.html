@@ -948,9 +948,9 @@ function onTemplateChange() {
   state.bodyEdited = false;
   state.conclusionEdited = false;
 
-  localStorage.setItem('dopplerLastTemplate', tpl.title);
-
   const tpl = TEMPLATES[idx];
+
+  localStorage.setItem('dopplerLastTemplate', tpl.title);
 
   // Init default values for each variable
   tpl.variables.forEach(v => {
