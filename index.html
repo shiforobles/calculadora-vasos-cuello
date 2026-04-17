@@ -385,6 +385,133 @@
       color: var(--primary);
     }
 
+    /* ─── Guide Panel ───────────────────────────────────────*/
+    .guide-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.25);
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transition: all .25s;
+    }
+    .guide-overlay.open { opacity: 1; visibility: visible; }
+
+    .guide-panel {
+      position: fixed;
+      top: 0; right: 0;
+      width: 400px; max-width: 96vw;
+      height: 100vh;
+      background: #f0fdf4;
+      border-left: 2px solid #86efac;
+      box-shadow: -6px 0 24px rgba(0,0,0,.13);
+      z-index: 50;
+      transform: translateX(100%);
+      transition: transform .3s cubic-bezier(.4,0,.2,1);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .guide-panel.open { transform: translateX(0); }
+
+    .guide-header {
+      background: #16a34a;
+      color: #fff;
+      padding: .85rem 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .guide-header h2 { font-size: .95rem; font-weight: 700; }
+    .guide-header .guide-tpl { font-size: .75rem; opacity: .85; margin-top: .15rem; }
+    .guide-close {
+      background: rgba(255,255,255,.2);
+      border: none; border-radius: 50%;
+      width: 28px; height: 28px;
+      color: #fff; font-size: 1rem; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .guide-close:hover { background: rgba(255,255,255,.35); }
+
+    .guide-body { overflow-y: auto; flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: .85rem; }
+
+    .guide-block {
+      background: #fff;
+      border: 1px solid #bbf7d0;
+      border-radius: 8px;
+      padding: .85rem 1rem;
+    }
+    .guide-block-title {
+      font-size: .7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      color: #166534;
+      margin-bottom: .55rem;
+      display: flex; align-items: center; gap: .35rem;
+    }
+    .guide-dx { font-size: .9rem; font-weight: 600; color: #0f172a; }
+
+    .guide-riesgo {
+      display: inline-block;
+      margin-top: .35rem;
+      padding: .2rem .6rem;
+      border-radius: 4px;
+      font-size: .75rem;
+      font-weight: 700;
+    }
+    .riesgo-bajo    { background: #dcfce7; color: #166534; }
+    .riesgo-mod     { background: #fef9c3; color: #854d0e; }
+    .riesgo-alto    { background: #ffedd5; color: #9a3412; }
+    .riesgo-muyalto { background: #fee2e2; color: #991b1b; }
+    .riesgo-critico { background: #1e293b; color: #f8fafc; }
+
+    .guide-conducta-list {
+      list-style: none;
+      display: flex; flex-direction: column; gap: .4rem;
+    }
+    .guide-conducta-list li {
+      font-size: .83rem;
+      color: #1e293b;
+      padding-left: 1.1rem;
+      position: relative;
+      line-height: 1.45;
+    }
+    .guide-conducta-list li::before {
+      content: '→';
+      position: absolute; left: 0;
+      color: #16a34a; font-weight: 700;
+    }
+    .guide-conducta-list li.warn::before { content: '⚠️'; left: -2px; }
+    .guide-conducta-list li.warn { color: #991b1b; font-weight: 600; }
+
+    .guide-seguimiento {
+      font-size: .83rem;
+      color: #1e293b;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    .guide-seguimiento strong { color: #166534; }
+
+    .guide-ref-table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+    .guide-ref-table tr:not(:last-child) td { border-bottom: 1px solid #dcfce7; }
+    .guide-ref-table td { padding: .3rem .2rem; color: #1e293b; }
+    .guide-ref-table td:last-child { font-weight: 600; text-align: right; color: #166534; }
+
+    .guide-btn {
+      width: 100%;
+      padding: .6rem;
+      background: #16a34a;
+      color: #fff;
+      border: none; border-radius: 6px;
+      font-size: .85rem; font-weight: 700;
+      cursor: pointer; font-family: inherit;
+      display: flex; align-items: center; justify-content: center; gap: .4rem;
+      transition: background .15s;
+      margin-top: .25rem;
+    }
+    .guide-btn:hover { background: #15803d; }
+
     /* ─── Responsive ─────────────────────────────────────── */
     @media (max-width: 768px) {
       .app {
@@ -449,6 +576,10 @@
         </select>
       </div>
       <div id="template-indicator" style="margin-top:.5rem;"></div>
+      <button class="guide-btn" onclick="toggleGuide()" style="margin-top:.65rem;">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Guía clínica para este paciente
+      </button>
     </div>
 
     <!-- Variables panel -->
@@ -552,6 +683,25 @@
 
 <!-- Toast -->
 <div id="toast"></div>
+
+<!-- Guide overlay -->
+<div class="guide-overlay" id="guide-overlay" onclick="closeGuide()"></div>
+
+<!-- Guide Panel -->
+<div class="guide-panel" id="guide-panel">
+  <div class="guide-header">
+    <div>
+      <h2>Guía clínica</h2>
+      <div class="guide-tpl" id="guide-tpl-name"></div>
+    </div>
+    <button class="guide-close" onclick="closeGuide()">✕</button>
+  </div>
+  <div class="guide-body" id="guide-body">
+    <p style="font-size:.85rem;color:#64748b;text-align:center;padding:1rem 0;">
+      Seleccione una plantilla para ver la guía clínica.
+    </p>
+  </div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════════════
      DATA
@@ -855,6 +1005,8 @@ function onVarInput(e) {
 
   checkSuggestion();
   updateStats();
+  // Refresh guide if open
+  if (document.getElementById('guide-panel').classList.contains('open')) renderGuide();
 }
 
 // ─── Render body & conclusion from template ───────────────
@@ -1050,6 +1202,273 @@ function clearAll(resetSelect = true) {
   document.getElementById('conclusion-edit-notice').classList.remove('visible');
 
   updateStats();
+}
+
+// ─── Clinical Guide ──────────────────────────────────────
+function toggleGuide() {
+  const panel = document.getElementById('guide-panel');
+  const isOpen = panel.classList.contains('open');
+  if (isOpen) { closeGuide(); } else { openGuide(); }
+}
+
+function openGuide() {
+  renderGuide();
+  document.getElementById('guide-panel').classList.add('open');
+  document.getElementById('guide-overlay').classList.add('open');
+}
+
+function closeGuide() {
+  document.getElementById('guide-panel').classList.remove('open');
+  document.getElementById('guide-overlay').classList.remove('open');
+}
+
+function getGuideData() {
+  if (state.templateIdx < 0) return null;
+  const tpl = TEMPLATES[state.templateIdx];
+  const vals = state.values;
+  const tipo = vals.tipo_placa || '';
+  const esVulnerable = tipo === 'fibrolipídica' || tipo === 'heterogénea';
+  const vps = parseFloat(vals.vps);
+  const t = tpl.title;
+
+  // ── Sin enfermedad ──────────────────────────────────────
+  if (t === 'Normal') return {
+    dx: 'Sin enfermedad aterosclerótica carotídea',
+    riesgo: 'Bajo', riesgoClass: 'riesgo-bajo',
+    conducta: [
+      'No requiere tratamiento específico por este estudio',
+      'Estratificar RCV global (SCORE2 / Framingham)',
+      'Controlar factores de riesgo (HTA, DBT, dislipemia, tabaco)',
+    ],
+    seguimiento: '2–3 años según perfil de riesgo',
+    ref: []
+  };
+
+  if (t === 'Normal añoso (fibroesclerosis)') return {
+    dx: 'Cambios involutivos. Sin enfermedad aterosclerótica activa',
+    riesgo: 'Bajo–Moderado', riesgoClass: 'riesgo-mod',
+    conducta: [
+      'Estratificar RCV global',
+      'Controlar FRCV si corresponde',
+      'No indicación de estatina solo por este hallazgo',
+    ],
+    seguimiento: '2–3 años',
+    ref: []
+  };
+
+  if (t === 'Engrosamiento parietal difuso (IMT)') return {
+    dx: 'Marcador precoz de aterosclerosis subclínica',
+    riesgo: 'Moderado', riesgoClass: 'riesgo-mod',
+    conducta: [
+      'Modificación de factores de riesgo (dieta mediterránea, ejercicio, cese tabaco)',
+      'Estatina si score de RCV global moderado–alto (SCORE2 ≥ 5%)',
+      'Control de HTA (meta < 130/80), DBT, dislipemia',
+    ],
+    seguimiento: '12–18 meses',
+    ref: [
+      ['GIM normal', '< 0.9 mm'],
+      ['GIM borderline', '0.9–1.0 mm'],
+      ['GIM aumentado', '> 1.0 mm'],
+    ]
+  };
+
+  if (t === 'Ateromatosis mínima') return {
+    dx: 'Aterosclerosis carotídea precoz — sin placa definida aún',
+    riesgo: 'Moderado', riesgoClass: 'riesgo-mod',
+    conducta: [
+      'Estatina según score de riesgo global (no automática)',
+      'Modificación intensiva de FRCV',
+      'Suspender tabaco (reduce progresión un 50%)',
+      'Control lipídico: LDL < 70 mg/dL si RCV moderado',
+    ],
+    seguimiento: '12 meses',
+    ref: [
+      ['Criterio de ateromatosis mínima', 'IMT focal 1.0–1.4 mm en bulbo'],
+      ['Sin placa definida', '< 1.5 mm de espesor focal'],
+    ]
+  };
+
+  // ── Placa no obstructiva ────────────────────────────────
+  const esPlaqueTemplate = [
+    'Placa pequeña no significativa',
+    'Placas bilaterales no significativas',
+    'Ateromatosis difusa sin repercusión',
+    'Estenosis <50%',
+  ].includes(t);
+
+  if (esPlaqueTemplate) return {
+    dx: 'Enfermedad Aterosclerótica Carotídea establecida — RCV Alto',
+    riesgo: esVulnerable ? 'Muy alto (placa vulnerable)' : 'Alto',
+    riesgoClass: esVulnerable ? 'riesgo-muyalto' : 'riesgo-alto',
+    conducta: [
+      'Estatina alta intensidad: Rosuvastatina 20–40 mg/d  ó  Atorvastatina 40–80 mg/d',
+      'Meta LDL < 55 mg/dL (ESC 2019 muy alto RCV)',
+      'AAS 100 mg/día',
+      'Control de HTA (meta < 130/80), DBT, obesidad, cese tabaco',
+      ...(esVulnerable ? ['⚠️ Placa vulnerable: riesgo embólico elevado → evaluar doble antiagregación (AAS + Clopidogrel 75 mg/d)'] : []),
+      ...(tipo === 'heterogénea' ? ['⚠️ Placa ulcerada/irregular: posible fuente embolígena — derivar si AIT/ACV previo'] : []),
+      t === 'Ateromatosis difusa sin repercusión' ? 'Carga aterosclerótica extensa: seguimiento más frecuente' : '',
+    ].filter(Boolean),
+    seguimiento: t === 'Ateromatosis difusa sin repercusión' ? '6 meses' : '12 meses',
+    ref: [
+      ['Criterio de placa', '≥ 1.5 mm ó protrusión > 0.5 mm sobre pared adyacente'],
+      ['Placa blanda/vulnerable', 'Hipoecogénica — alto riesgo de rotura'],
+      ['Placa fibrocálcica', 'Hiperecogénica con sombra — estable'],
+      ['Meta LDL (muy alto RCV)', '< 55 mg/dL'],
+      ['Meta LDL (alto RCV)', '< 70 mg/dL'],
+    ]
+  };
+
+  // ── Estenosis moderada ──────────────────────────────────
+  if (t === 'Estenosis moderada ACI (50–69%)') return {
+    dx: 'Estenosis moderada de ACI — tratamiento médico con seguimiento estricto',
+    riesgo: 'Alto', riesgoClass: 'riesgo-alto',
+    conducta: [
+      'Estatina alta intensidad (Rosuva 20–40 mg ó Atorva 40–80 mg) — meta LDL < 55',
+      'AAS 100 mg/día',
+      'Control estricto de todos los FRCV',
+      'Derivar a cirugía vascular para evaluación (no indicación quirúrgica automática)',
+      '⚠️ Si AIT o ACV previo: evaluación urgente (ventana quirúrgica 2 semanas)',
+    ],
+    seguimiento: '6 meses con eco Doppler',
+    ref: [
+      ['VPS ACI moderada', '125–229 cm/s'],
+      ['Ratio ACI/ACC', '2.0–3.9'],
+      ['VFD ACI', '40–99 cm/s'],
+      ['Umbral quirúrgico (sintomático)', '≥ 50% con AIT/ACV'],
+    ]
+  };
+
+  // ── Estenosis severa ────────────────────────────────────
+  if (t === 'Estenosis severa ACI') return {
+    dx: 'Estenosis severa de ACI — evaluar revascularización',
+    riesgo: 'Muy alto / Crítico', riesgoClass: 'riesgo-critico',
+    conducta: [
+      '⚠️ Derivación urgente a cirugía vascular',
+      'Sintomático (AIT/ACV): CEA ideal en las primeras 2 semanas',
+      'Asintomático ≥ 70%: evaluar CEA si expectativa de vida > 5 años y riesgo quirúrgico bajo',
+      'Antiagregante previo al procedimiento (AAS 100 mg/día)',
+      'Estatina alta intensidad (estabilización preoperatoria)',
+      'No suspender antiagregante ni estatina en el perioperatorio',
+    ],
+    seguimiento: 'Post-CEA: 1 mes, 6 meses, luego anual',
+    ref: [
+      ['VPS ACI severa', '≥ 230 cm/s'],
+      ['Ratio ACI/ACC severa', '≥ 4.0'],
+      ['VFD ACI severa', '≥ 100 cm/s'],
+      ['Umbral quirúrgico sintomático', '≥ 50%'],
+      ['Umbral quirúrgico asintomático', '≥ 70%'],
+      ['Técnica de elección', 'CEA (endarterectomía)'],
+      ['Alternativa', 'CAS (stenting) si alto riesgo quirúrgico'],
+    ]
+  };
+
+  // ── Oclusión ────────────────────────────────────────────
+  if (t === 'Oclusión ACI') return {
+    dx: 'Oclusión total de ACI — no operable en la mayoría de los casos',
+    riesgo: 'Muy alto', riesgoClass: 'riesgo-muyalto',
+    conducta: [
+      'Tratamiento médico (oclusión crónica no es quirúrgica)',
+      'Anticoagulación si trombo fresco reciente (discutir con neurología)',
+      'AAS 100 mg/día o anticoagulación según etiología',
+      'Estatina alta intensidad',
+      'Derivar a neurología / unidad de ACV',
+      '⚠️ Si ACV agudo: activar código ACV — evaluación para trombectomía',
+    ],
+    seguimiento: '3–6 meses (evaluar circulación colateral)',
+    ref: [
+      ['Signo directo', 'Ausencia total de flujo Doppler en ACI'],
+      ['ACC ipsilateral', 'Patrón de alta resistencia (sin salida distal)'],
+      ['ACE ipsilateral', 'Flujo conservado (distingue de suboclusión)'],
+      ['Diferencial', 'Suboclusión: señal filiforme presente en color'],
+    ]
+  };
+
+  // ── Estenosis externa ───────────────────────────────────
+  if (t === 'Estenosis carótida externa significativa') return {
+    dx: 'Estenosis de carótida externa — habitualmente no quirúrgica',
+    riesgo: 'Moderado–Alto', riesgoClass: 'riesgo-alto',
+    conducta: [
+      'Tratamiento médico en la mayoría de los casos',
+      'Estatina alta intensidad + AAS 100 mg/día',
+      'La ACE estenótica raramente requiere cirugía (salvo casos selectos)',
+      'Si AIT en territorio ipsilateral: derivar para evaluación',
+    ],
+    seguimiento: '12 meses',
+    ref: [
+      ['Identificación ACE', 'Patrón alta resistencia (diástole baja)'],
+      ['Temporal tap sign', 'Golpear art. temporal → ondas en espectral ACE'],
+      ['ACI vs ACE', 'ACI: baja resistencia, sin ramas visibles proximales'],
+    ]
+  };
+
+  return null;
+}
+
+function renderGuide() {
+  const tpl = state.templateIdx >= 0 ? TEMPLATES[state.templateIdx] : null;
+  const nameEl = document.getElementById('guide-tpl-name');
+  const bodyEl = document.getElementById('guide-body');
+
+  if (!tpl) {
+    nameEl.textContent = '';
+    bodyEl.innerHTML = '<p style="font-size:.85rem;color:#64748b;text-align:center;padding:1rem 0;">Seleccione una plantilla para ver la guía clínica.</p>';
+    return;
+  }
+
+  nameEl.textContent = tpl.title;
+  const g = getGuideData();
+  if (!g) { bodyEl.innerHTML = '<p style="padding:1rem;font-size:.83rem;color:#64748b;">Sin guía disponible para esta plantilla.</p>'; return; }
+
+  const conducta = g.conducta.map(c => {
+    const isWarn = c.startsWith('⚠️');
+    const text = isWarn ? c.replace('⚠️ ', '') : c;
+    return `<li class="${isWarn ? 'warn' : ''}">${isWarn ? '⚠️ ' : ''}${text}</li>`;
+  }).join('');
+
+  const refRows = g.ref && g.ref.length
+    ? g.ref.map(([k, v]) => `<tr><td>${k}</td><td>${v}</td></tr>`).join('')
+    : '';
+
+  bodyEl.innerHTML = `
+    <div class="guide-block">
+      <div class="guide-block-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4m0 4h.01"/></svg>
+        Diagnóstico
+      </div>
+      <div class="guide-dx">${g.dx}</div>
+      <div class="guide-riesgo ${g.riesgoClass}">Riesgo: ${g.riesgo}</div>
+    </div>
+
+    <div class="guide-block">
+      <div class="guide-block-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+        Conducta terapéutica
+      </div>
+      <ul class="guide-conducta-list">${conducta}</ul>
+    </div>
+
+    <div class="guide-block">
+      <div class="guide-block-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+        Seguimiento sugerido
+      </div>
+      <div class="guide-seguimiento"><strong>${g.seguimiento}</strong></div>
+    </div>
+
+    ${refRows ? `
+    <div class="guide-block">
+      <div class="guide-block-title">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>
+        Valores de referencia
+      </div>
+      <table class="guide-ref-table">${refRows}</table>
+    </div>` : ''}
+
+    <p style="font-size:.7rem;color:#86efac;text-align:center;padding:.25rem 0;">
+      Solo orientación clínica — no incluida en el informe
+    </p>
+  `;
 }
 
 // ─── Toast ────────────────────────────────────────────────
