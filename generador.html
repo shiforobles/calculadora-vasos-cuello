@@ -712,9 +712,9 @@ const TEMPLATES = [
   {
     "group": "Sin patología",
     "title": "Normal",
-    "variables": ["gim_d", "gim_i"],
-    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nCalibres arteriales de las arterias carótidas bilaterales dentro de límites normales.\nParedes arteriales regulares, sin evidencia de engrosamientos parietales ni placas ateromatosas.\n\nComplejo íntima-media (GIM): derecho {{gim_d}} cm — izquierdo {{gim_i}} cm. Valores dentro de límites normales.\n\nLas velocidades de flujo se encuentran dentro de parámetros normales, con morfología espectral fisiológica y ausencia de aliasing en la señal color.\n\nNo se evidencian signos de estenosis ni alteraciones hemodinámicas en arterias carótidas comunes, internas ni externas.\n\nArterias vertebrales permeables, con flujo anterógrado y simétrico en segmento V2 bilateral.",
-    "conclusion": "Sin enfermedad aterosclerótica carotídea. GIM derecho {{gim_d}} cm, izquierdo {{gim_i}} cm — dentro de límites normales."
+    "variables": [],
+    "body": "ECODOPPLER DE VASOS DE CUELLO\n\nCalibres arteriales de las arterias carótidas bilaterales dentro de límites normales.\nParedes arteriales regulares, sin evidencia de engrosamientos parietales ni placas ateromatosas.\n\nLas velocidades de flujo se encuentran dentro de parámetros normales, con morfología espectral fisiológica y ausencia de aliasing en la señal color.\n\nNo se evidencian signos de estenosis ni alteraciones hemodinámicas en arterias carótidas comunes, internas ni externas.\n\nArterias vertebrales permeables, con flujo anterógrado y simétrico en segmento V2 bilateral.",
+    "conclusion": "Sin enfermedad aterosclerótica carotídea. Estudio dentro de límites normales."
   },
   {
     "group": "Sin patología",
@@ -839,20 +839,6 @@ const VAR_CONFIG = {
       { value: 'heterogénea', label: 'Heterogénea' },
       { value: 'mixta', label: 'Mixta' }
     ]
-  },
-  gim_d: {
-    type: 'number',
-    label: 'GIM derecho (cm)',
-    placeholder: 'ej: 0.07',
-    step: '0.01',
-    min: '0'
-  },
-  gim_i: {
-    type: 'number',
-    label: 'GIM izquierdo (cm)',
-    placeholder: 'ej: 0.07',
-    step: '0.01',
-    min: '0'
   },
   vps_acc: {
     type: 'number',
@@ -1326,7 +1312,12 @@ function getGuideData() {
       'Controlar factores de riesgo (HTA, DBT, dislipemia, tabaco)',
     ],
     seguimiento: '2–3 años según perfil de riesgo',
-    ref: []
+    ref: [
+      ['GIM normal', '< 0.09 cm  (< 0.9 mm)'],
+      ['GIM borderline', '0.09 – 0.10 cm  (0.9 – 1.0 mm)'],
+      ['GIM aumentado', '> 0.10 cm  (> 1.0 mm)'],
+      ['Criterio de placa', '≥ 0.15 cm  (≥ 1.5 mm) focal'],
+    ]
   };
 
   if (t === 'Normal añoso (fibroesclerosis)') return {
