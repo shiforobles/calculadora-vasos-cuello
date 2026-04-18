@@ -627,6 +627,31 @@
   <!-- ═══ SIDEBAR ══════════════════════════════════════════ -->
   <aside class="sidebar">
 
+    <!-- Patient data -->
+    <div class="card">
+      <div class="card-title">Paciente</div>
+      <div style="display:flex;flex-direction:column;gap:.6rem;">
+        <div class="field">
+          <label class="field-label" for="p-hc">HC / Nombre</label>
+          <input type="text" id="p-hc" placeholder="Nº historia clínica o apellido" oninput="state.patient.hc=this.value">
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;">
+          <div class="field">
+            <label class="field-label" for="p-edad">Edad</label>
+            <input type="number" id="p-edad" placeholder="años" min="0" max="120" oninput="state.patient.edad=this.value">
+          </div>
+          <div class="field">
+            <label class="field-label" for="p-sexo">Sexo</label>
+            <select id="p-sexo" onchange="state.patient.sexo=this.value">
+              <option value="">—</option>
+              <option value="M">M</option>
+              <option value="F">F</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Template selector -->
     <div class="card">
       <div class="card-title">Plantilla</div>
@@ -977,7 +1002,8 @@ let state = {
   templateIdx: -1,
   values: {},
   bodyEdited: false,
-  conclusionEdited: false
+  conclusionEdited: false,
+  patient: { hc: '', edad: '', sexo: '' }
 };
 
 // ─── Init ─────────────────────────────────────────────────
@@ -1385,38 +1411,40 @@ function saveSettings() {
 
 async function saveToSheets() {
   const url = localStorage.getItem('sheetsScriptUrl');
-  if (!url) {
-    openSettings();
-    showToast('Configurá la URL de tu Apps Script primero.');
-    return;
-  }
-  if (state.templateIdx < 0) {
-    showToast('Seleccioná una plantilla antes de guardar.');
-    return;
-  }
+  if (!url) { openSettings(); showToast('Configurá la URL de tu Apps Script primero.'); return; }
+  if (state.templateIdx < 0) { showToast('Seleccioná una plantilla antes de guardar.'); return; }
 
   const tpl = TEMPLATES[state.templateIdx];
-  const body = document.getElementById('report-body').value.trim();
+  const v = state.values;
   const conclusion = document.getElementById('report-conclusion').value.trim();
-  if (!body && !conclusion) { showToast('El informe está vacío.'); return; }
+
+  const payload = JSON.stringify({
+    fecha:       new Date().toLocaleString('es-AR'),
+    hc:          state.patient.hc   || '',
+    edad:        state.patient.edad  || '',
+    sexo:        state.patient.sexo  || '',
+    grupo:       tpl.group           || '',
+    diagnostico: tpl.title,
+    lado:        v.lado || v.lado_bilateral || '',
+    tipo_placa:  v.tipo_placa  || '',
+    gim_d:       v.gim_d       || '',
+    gim_i:       v.gim_i       || '',
+    vps_acc:     v.vps_acc     || '',
+    vps_aci:     v.vps        || '',
+    vfd_aci:     v.vfd        || '',
+    ratio:       v.ratio       || '',
+    conclusion
+  });
 
   const btn = document.getElementById('btn-sheets');
   btn.disabled = true;
   btn.textContent = 'Guardando...';
 
-  const payload = JSON.stringify({
-    fecha: new Date().toLocaleString('es-AR'),
-    plantilla: tpl.title,
-    grupo: tpl.group || '',
-    conclusion,
-    cuerpo: body
-  });
-
   try {
     await fetch(url, { method: 'POST', mode: 'no-cors', body: payload });
-    showToast('✓ Informe guardado en Google Sheets');
+    showToast('✓ Guardado en Sheets');
   } catch (err) {
-    showToast('Error de red al guardar. Verificá tu conexión.');
+    showToast('Error de red. Verificá tu conexión.');
   } finally {
     btn.disabled = false;
     btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Guardar en Sheets`;
