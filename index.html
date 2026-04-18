@@ -385,6 +385,59 @@
       color: var(--primary);
     }
 
+    /* ─── Sheets / Settings Modal ───────────────────────────*/
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.4);
+      z-index: 60;
+      display: flex; align-items: center; justify-content: center;
+      opacity: 0; visibility: hidden;
+      transition: all .2s;
+    }
+    .modal-overlay.open { opacity: 1; visibility: visible; }
+
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      padding: 1.5rem;
+      width: 460px; max-width: 95vw;
+      box-shadow: 0 20px 40px rgba(0,0,0,.2);
+      transform: translateY(8px);
+      transition: transform .2s;
+    }
+    .modal-overlay.open .modal { transform: translateY(0); }
+
+    .modal h3 { font-size: 1rem; font-weight: 700; margin-bottom: .25rem; }
+    .modal .modal-sub { font-size: .8rem; color: var(--muted); margin-bottom: 1.1rem; line-height: 1.5; }
+
+    .modal-field { display: flex; flex-direction: column; gap: .35rem; margin-bottom: 1rem; }
+    .modal-field label { font-size: .78rem; font-weight: 600; color: var(--muted); }
+    .modal-field input { font-size: .85rem; }
+
+    .modal-actions { display: flex; gap: .5rem; justify-content: flex-end; margin-top: 1.1rem; }
+
+    .sheets-status {
+      font-size: .75rem;
+      padding: .3rem .6rem;
+      border-radius: 4px;
+      margin-top: .4rem;
+      display: none;
+    }
+    .sheets-status.ok  { display:block; background:#dcfce7; color:#166534; }
+    .sheets-status.err { display:block; background:#fee2e2; color:#991b1b; }
+
+    .btn-sheets {
+      background: #1a73e8; color: #fff;
+      border: none; border-radius: 6px;
+      padding: .5rem 1rem;
+      font-size: .83rem; font-weight: 600;
+      cursor: pointer; font-family: inherit;
+      display: inline-flex; align-items: center; gap: .35rem;
+      transition: background .15s;
+    }
+    .btn-sheets:hover { background: #1557b0; }
+    .btn-sheets:disabled { background: #93c5fd; cursor: not-allowed; }
+
     /* ─── Guide Panel ───────────────────────────────────────*/
     .guide-overlay {
       position: fixed;
@@ -556,6 +609,14 @@
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
         Exportar .txt
       </button>
+      <button class="btn-sheets btn-sm" onclick="saveToSheets()" id="btn-sheets">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+        Guardar en Sheets
+      </button>
+      <button class="btn btn-ghost btn-sm" onclick="openSettings()" title="Configurar Google Sheets">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+        Configurar
+      </button>
       <button class="btn btn-danger btn-sm" onclick="clearAll()">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
         Limpiar
@@ -683,6 +744,26 @@
 
 <!-- Toast -->
 <div id="toast"></div>
+
+<!-- Settings Modal -->
+<div class="modal-overlay" id="settings-overlay" onclick="closeSettings(event)">
+  <div class="modal" onclick="event.stopPropagation()">
+    <h3>Guardar informes en Google Sheets</h3>
+    <p class="modal-sub">
+      Pegá la URL de tu Apps Script una vez y el botón "Guardar en Sheets" funcionará desde cualquier computadora donde repitas este paso.<br><br>
+      ¿No tenés el script aún? Seguí las instrucciones del paso a paso que te compartimos.
+    </p>
+    <div class="modal-field">
+      <label>URL del Apps Script</label>
+      <input type="url" id="sheets-url-input" placeholder="https://script.google.com/macros/s/..." />
+    </div>
+    <div id="sheets-status" class="sheets-status"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeSettings()">Cancelar</button>
+      <button class="btn-sheets" onclick="saveSettings()">Guardar configuración</button>
+    </div>
+  </div>
+</div>
 
 <!-- Guide overlay -->
 <div class="guide-overlay" id="guide-overlay" onclick="closeGuide()"></div>
@@ -1273,6 +1354,73 @@ function clearAll(resetSelect = true) {
   document.getElementById('conclusion-edit-notice').classList.remove('visible');
 
   updateStats();
+}
+
+// ─── Google Sheets Integration ───────────────────────────
+function openSettings() {
+  const url = localStorage.getItem('sheetsScriptUrl') || '';
+  document.getElementById('sheets-url-input').value = url;
+  document.getElementById('sheets-status').className = 'sheets-status';
+  document.getElementById('settings-overlay').classList.add('open');
+}
+
+function closeSettings(e) {
+  if (e && e.target !== document.getElementById('settings-overlay')) return;
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+
+function saveSettings() {
+  const url = document.getElementById('sheets-url-input').value.trim();
+  const status = document.getElementById('sheets-status');
+  if (!url.startsWith('https://script.google.com/macros/s/')) {
+    status.className = 'sheets-status err';
+    status.textContent = 'La URL debe empezar con https://script.google.com/macros/s/...';
+    return;
+  }
+  localStorage.setItem('sheetsScriptUrl', url);
+  status.className = 'sheets-status ok';
+  status.textContent = '✓ URL guardada correctamente en este navegador.';
+  setTimeout(() => document.getElementById('settings-overlay').classList.remove('open'), 1200);
+}
+
+async function saveToSheets() {
+  const url = localStorage.getItem('sheetsScriptUrl');
+  if (!url) {
+    openSettings();
+    showToast('Configurá la URL de tu Apps Script primero.');
+    return;
+  }
+  if (state.templateIdx < 0) {
+    showToast('Seleccioná una plantilla antes de guardar.');
+    return;
+  }
+
+  const tpl = TEMPLATES[state.templateIdx];
+  const body = document.getElementById('report-body').value.trim();
+  const conclusion = document.getElementById('report-conclusion').value.trim();
+  if (!body && !conclusion) { showToast('El informe está vacío.'); return; }
+
+  const btn = document.getElementById('btn-sheets');
+  btn.disabled = true;
+  btn.textContent = 'Guardando...';
+
+  const payload = JSON.stringify({
+    fecha: new Date().toLocaleString('es-AR'),
+    plantilla: tpl.title,
+    grupo: tpl.group || '',
+    conclusion,
+    cuerpo: body
+  });
+
+  try {
+    await fetch(url, { method: 'POST', mode: 'no-cors', body: payload });
+    showToast('✓ Informe guardado en Google Sheets');
+  } catch (err) {
+    showToast('Error de red al guardar. Verificá tu conexión.');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg> Guardar en Sheets`;
+  }
 }
 
 // ─── Clinical Guide ──────────────────────────────────────
